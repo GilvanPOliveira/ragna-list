@@ -1,12 +1,38 @@
 from flask import Flask
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_mail import Mail
+from flask_jwt_extended import JWTManager
+from config import Config
 
-app = Flask(__name__)
-CORS(app)
+db = SQLAlchemy()
+migrate = Migrate()
+mail = Mail()
+jwt = JWTManager()
 
-@app.route('/')
-def home():
-    return {'status': 'RagnaList Backend running'}
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Extensões
+    CORS(app, supports_credentials=True)
+    db.init_app(app)
+    migrate.init_app(app, db)
+    mail.init_app(app)
+    jwt.init_app(app)
+
+    # Blueprints (adicione depois)
+    # from routes.auth import bp as auth_bp
+    # app.register_blueprint(auth_bp, url_prefix="/auth")
+
+    @app.route("/")
+    def index():
+        return {"status": "RagnaList Backend online"}
+
+    return app
+
+app = create_app()
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=app.config["DEBUG"])
