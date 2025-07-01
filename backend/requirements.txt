@@ -1,0 +1,8 @@
+flask
+flask-cors
+flask-mail
+flask-jwt-extended
+sqlalchemy
+psycopg2-binary
+requests
+gunicorn
