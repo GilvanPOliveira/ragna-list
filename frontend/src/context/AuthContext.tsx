@@ -44,9 +44,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
+  try {
+    // tenta avisar o backend
     await api.post("/api/auth/logout");
+  } catch {
+    // se der 401/erro, apenas prossegue
+  } finally {
+    // garante limpeza local
     setUser(null);
+  }
   };
+
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout }}>

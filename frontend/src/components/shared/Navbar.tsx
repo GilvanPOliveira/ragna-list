@@ -8,9 +8,10 @@ export default function Navbar() {
   const [search, setSearch] = useState("");
 
   const handleLogout = async () => {
-    await logout();
-    nav("/");               // permanece na Home
+  await logout();   // nunca lança, pois já tratamos inside
+  nav("/");         // vai para Home
   };
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
