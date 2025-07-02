@@ -8,14 +8,19 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);   // opcional
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await register(email, password);
-      nav("/");
+      setMsg("Conta criada! Faça login.");
+      nav("/login");                               // ⇦ redireciona pro login
     } catch (err: any) {
       setMsg(err.response?.data?.msg || "Erro ao cadastrar");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -26,7 +31,7 @@ export default function RegisterPage() {
         className="bg-white p-8 rounded shadow w-80 space-y-4"
       >
         <h1 className="text-2xl font-bold text-center">Cadastro</h1>
-        {msg && <p className="text-red-600 text-sm">{msg}</p>}
+        {msg && <p className="text-sm text-center">{msg}</p>}
         <input
           type="email"
           required
@@ -45,9 +50,10 @@ export default function RegisterPage() {
         />
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
-          Criar conta
+          {loading ? "Criando..." : "Criar conta"}
         </button>
         <p className="text-center text-sm">
           Já possui conta?{" "}

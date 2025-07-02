@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
     create_access_token, jwt_required,
-    set_access_cookies, unset_jwt_cookies
+    set_access_cookies, unset_jwt_cookies, get_jwt_identity
 )
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
-from app import db, mail
+from extensions import db, mail                 # <<== AQUI
 from models import User
 from flask_mail import Message
 from config import Config
@@ -102,3 +102,12 @@ def pwd_reset_confirm():
     user.set_password(new_password)
     db.session.commit()
     return {"msg": "Senha redefinida"}, 200
+
+@bp.get("/ping")
+@jwt_required(optional=True)
+def ping():
+    uid = get_jwt_identity()
+    if not uid:
+        return {"user": None}, 200
+    user = User.query.get(uid)
+    return {"user": {"id": user.id, "email": user.email}}, 200

@@ -7,14 +7,15 @@ class Config:
     DEBUG      = os.environ.get("FLASK_ENV") == "development"
 
     # Banco (Render ou local)
-    SQLALCHEMY_DATABASE_URI        = os.environ.get("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = (
+    os.environ.get("DATABASE_URL") or "sqlite:///ragna_local.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT
     JWT_SECRET_KEY           = os.environ.get("JWT_SECRET_KEY", "jwt-secret")
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
     JWT_TOKEN_LOCATION       = ["cookies"]
-    JWT_COOKIE_SECURE        = True           # False se testar apenas em HTTP
+    JWT_COOKIE_SECURE = not (os.environ.get("FLASK_ENV") == "development")
     JWT_COOKIE_SAMESITE      = "Lax"
     JWT_COOKIE_CSRF_PROTECT  = False          # simplifica no início
 
