@@ -26,12 +26,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   // simples “ping” para verificar cookie
-  useEffect(() => {
-    api
-      .get("/api/auth/ping")
-      .then((res) => setUser(res.data.user))
-      .catch(() => setUser(null));
-  }, []);
+useEffect(() => {
+api.get("/api/auth/ping")
+   .then(res => setUser(res.data.user))
+   .catch(() => setUser(null));
+}, []);
+
+
 
   const login = async (email: string, password: string) => {
     await api.post("/api/auth/login", { email, password });

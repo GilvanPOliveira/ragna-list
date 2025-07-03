@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import (
     create_access_token, jwt_required,
-    set_access_cookies, unset_jwt_cookies, get_jwt_identity
+    set_access_cookies, unset_jwt_cookies, get_jwt_identity,verify_jwt_in_request
 )
+from flask_jwt_extended.exceptions import NoAuthorizationError
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
-from extensions import db, mail                 # <<== AQUI
+from extensions import db, mail               
 from models import User
 from flask_mail import Message
 from config import Config
@@ -103,11 +104,49 @@ def pwd_reset_confirm():
     db.session.commit()
     return {"msg": "Senha redefinida"}, 200
 
+
 @bp.get("/ping")
-@jwt_required(optional=True)
 def ping():
-    uid = get_jwt_identity()
+    """
+    Sempre devolve 200.
+    - Se o cookie JWT existir e for válido → devolve dados do usuário.
+    - Caso contrário → devolve {"user": None}.
+    Nenhum decorator JWT é usado, então não sairão 401/422 automáticos.
+    """
+    uid = None
+    try:
+        verify_jwt_in_request()   # tenta validar; se não houver ou for inválido, dispara exceção
+        uid = get_jwt_identity()
+    except Exception:
+        pass                      # ignora faltas/erros de token
+
     if not uid:
         return {"user": None}, 200
+
+    user = User.query.get(uid)
+    if not user:
+        return {"user": None}, 200
+
+    return {"user": {"id": user.id, "email": user.email}}, 200
+    try:
+        # tenta ler o cookie; se não houver, apenas continua
+        verify_jwt_in_request(optional=True)      # não levanta se versão nova
+    except NoAuthorizationError:
+        pass                                      # versões antigas levantam – ignoramos
+
+    uid = get_jwt_identity()                      # None se não logado
+    if not uid:
+        return {"user": None}, 200
+
+    user = User.query.get(uid)
+    if not user:
+        return {"user": None}, 200
+
+    return {"user": {"id": user.id, "email": user.email}}, 200
+    verify_jwt_in_request(optional=True)      # não gera erro se não houver
+    uid = get_jwt_identity()              # None caso sem cookie
+    if not uid:
+        return {"user": None}, 200
+
     user = User.query.get(uid)
     return {"user": {"id": user.id, "email": user.email}}, 200

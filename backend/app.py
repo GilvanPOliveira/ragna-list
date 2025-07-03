@@ -4,7 +4,8 @@ load_dotenv()
 from flask import Flask
 from flask_cors import CORS
 from config import Config
-from extensions import db, mg, mail, jwt    # <<== AQUI
+from extensions import db, mg, mail, jwt
+
 
 def create_app():
     app = Flask(__name__)
@@ -18,6 +19,9 @@ def create_app():
     jwt.init_app(app)
 
     # Blueprints
+    from routes.items import bp as items_bp
+    app.register_blueprint(items_bp, url_prefix="/api/items")
+
     from routes.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
 

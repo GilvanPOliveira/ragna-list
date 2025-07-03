@@ -5,39 +5,47 @@ import { useState } from "react";
 export default function Navbar() {
   const { user, logout } = useAuth();
   const nav = useNavigate();
-  const [search, setSearch] = useState("");
 
-  const handleLogout = async () => {
-  await logout();   // nunca lança, pois já tratamos inside
-  nav("/");         // vai para Home
-  };
+  /* estado do campo de busca */
+  const [query, setQuery] = useState("");
 
-
-  const handleSearch = (e: React.FormEvent) => {
+  /* envia a busca */
+  const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: enviar `search` para página/rota de resultados
-    console.log("buscou:", search);
+    const term = query.trim();
+    if (!term) return;
+
+    /* se só dígitos -> busca por ID; caso contrário busca por texto */
+    const param = /^\d+$/.test(term) ? `id=${term}` : `q=${encodeURIComponent(term)}`;
+    nav(`/busca?${param}`);
+    setQuery("");
   };
 
   return (
-    <nav className="bg-blue-600 text-white px-4 py-2 flex flex-wrap items-center gap-6">
-      {/* Logo */}
+    <nav className="bg-blue-600 text-white px-4 py-2 flex flex-wrap items-center gap-5">
+      {/* logo */}
       <Link to="/" className="font-bold text-xl mr-4">
         RagnaList
       </Link>
 
-      {/* Campo de busca */}
-      <form onSubmit={handleSearch} className="flex-1 max-w-sm">
+      {/* BUSCA: input + botão */}
+      <form onSubmit={submitSearch} className="flex items-center gap-2">
         <input
           type="text"
           placeholder="Buscar itens..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded px-3 py-1 text-gray-900"
+          className="rounded px-3 py-1 text-gray-900 w-60"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
         />
+        <button
+          type="submit"
+          className="bg-white/20 px-3 py-1 rounded hover:bg-white/30"
+        >
+          Buscar
+        </button>
       </form>
 
-      {/* Links principais */}
+      {/* links principais */}
       <Link to="/minha-lista" className="hover:underline">
         Minha Lista
       </Link>
@@ -45,13 +53,16 @@ export default function Navbar() {
         Inventário
       </Link>
 
-      {/* Login / Usuário */}
+      {/* login / logout */}
       <div className="ml-auto flex items-center gap-3">
         {user ? (
           <>
             <span>{user.email}</span>
             <button
-              onClick={handleLogout}
+              onClick={async () => {
+                await logout();
+                nav("/");
+              }}
               className="bg-white/20 px-3 py-1 rounded hover:bg-white/30"
             >
               Sair

@@ -6,6 +6,7 @@ import ListaPage from "./pages/ListaPage";
 import InventarioPage from "./pages/InventarioPage";
 import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/shared/Navbar";
+import SearchResultsPage from "./pages/SearchResultsPage";
 
 export default function App() {
   const { user } = useAuth();
@@ -26,7 +27,7 @@ export default function App() {
           path="/inventario"
           element={user ? <InventarioPage /> : <Navigate to="/login" replace />}
         />
-
+<Route path="/busca" element={<SearchResultsPage />} />
         {/* Autenticação */}
         <Route
           path="/login"
