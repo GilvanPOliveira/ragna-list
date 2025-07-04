@@ -1,12 +1,15 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "./pages/Auth/LoginPage";
-import RegisterPage from "./pages/Auth/RegisterPage";
-import HomePage from "./pages/HomePage";
-import ListaPage from "./pages/ListaPage";
+
+import HomePage       from "./pages/HomePage";
+import LoginPage      from "./pages/Auth/LoginPage";
+import RegisterPage   from "./pages/Auth/RegisterPage";
+import ListaPage      from "./pages/ListaPage";
 import InventarioPage from "./pages/InventarioPage";
-import { useAuth } from "./context/AuthContext";
+
+import ResultItemPage from "./pages/ResultItemPage";   // ← página única
+
 import Navbar from "./components/shared/Navbar";
-import SearchResultsPage from "./pages/SearchResultsPage";
+import { useAuth } from "./context/AuthContext";
 
 export default function App() {
   const { user } = useAuth();
@@ -16,9 +19,11 @@ export default function App() {
       <Navbar />
 
       <Routes>
+        {/* público */}
         <Route path="/" element={<HomePage />} />
+        <Route path="/busca" element={<ResultItemPage />} />
 
-        {/* Páginas protegidas */}
+        {/* protegidos */}
         <Route
           path="/minha-lista"
           element={user ? <ListaPage /> : <Navigate to="/login" replace />}
@@ -27,8 +32,8 @@ export default function App() {
           path="/inventario"
           element={user ? <InventarioPage /> : <Navigate to="/login" replace />}
         />
-<Route path="/busca" element={<SearchResultsPage />} />
-        {/* Autenticação */}
+
+        {/* autenticação */}
         <Route
           path="/login"
           element={!user ? <LoginPage /> : <Navigate to="/" replace />}
@@ -38,6 +43,7 @@ export default function App() {
           element={!user ? <RegisterPage /> : <Navigate to="/" replace />}
         />
 
+        {/* fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

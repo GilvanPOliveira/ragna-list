@@ -1,34 +1,32 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useState } from "react";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
-  /* estado do campo de busca */
   const [query, setQuery] = useState("");
 
-  /* envia a busca */
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const term = query.trim();
     if (!term) return;
 
-    /* se só dígitos -> busca por ID; caso contrário busca por texto */
-    const param = /^\d+$/.test(term) ? `id=${term}` : `q=${encodeURIComponent(term)}`;
-    nav(`/busca?${param}`);
+    /* numérico → mesma página resultados c/ id */
+    const param = /^\d+$/.test(term)
+      ? `id=${term}`
+      : `q=${encodeURIComponent(term)}`;
+    navigate(`/busca?${param}`);
     setQuery("");
   };
 
   return (
     <nav className="bg-blue-600 text-white px-4 py-2 flex flex-wrap items-center gap-5">
-      {/* logo */}
       <Link to="/" className="font-bold text-xl mr-4">
         RagnaList
       </Link>
 
-      {/* BUSCA: input + botão */}
       <form onSubmit={submitSearch} className="flex items-center gap-2">
         <input
           type="text"
@@ -45,7 +43,6 @@ export default function Navbar() {
         </button>
       </form>
 
-      {/* links principais */}
       <Link to="/minha-lista" className="hover:underline">
         Minha Lista
       </Link>
@@ -53,7 +50,6 @@ export default function Navbar() {
         Inventário
       </Link>
 
-      {/* login / logout */}
       <div className="ml-auto flex items-center gap-3">
         {user ? (
           <>
@@ -61,7 +57,7 @@ export default function Navbar() {
             <button
               onClick={async () => {
                 await logout();
-                nav("/");
+                navigate("/");
               }}
               className="bg-white/20 px-3 py-1 rounded hover:bg-white/30"
             >

@@ -1,0 +1,7 @@
+.job-grid           { border-collapse: collapse; }
+.job-cell           { padding: 2px; }
+
+.job-cell-icons     { display: flex; gap: 2px; }
+
+.job-icon           { width: 24px; height: 24px; }
+.job-icon.disabled  { filter: grayscale(1) opacity(.25); }
